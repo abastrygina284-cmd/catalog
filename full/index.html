@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Каталог ЮГРОС — стекло, триплекс, обработка</title>
+<!-- Превью ссылки в мессенджерах; при смене адреса каталога поправить og:url и og:image -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="ЮГРОС — каталог стекла и зеркал с ценами">
+<meta property="og:description" content="32 вида стекла и зеркал, фото крупным планом, цены партнёра за м².">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --ink:#101418; --muted:#66707c; --line:#e1e6ec;
+  --accent:#0a7fd0; --accent-d:#0868ab; --soft:#e6f2fb; --dark:#0f1318;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 12px 32px -8px rgba(16,24,40,.10);
+  --disp:"Unbounded","Segoe UI",system-ui,sans-serif;
+  --text:"Manrope","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--text);background:var(--bg);color:var(--ink);line-height:1.45;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+a{color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+
+/* шапка */
+.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.86);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:22px;height:66px}
+.logo{height:36px;display:block}
+.top .sp{flex:1}
+.top a{font-weight:700;text-decoration:none;white-space:nowrap}
+.top a.site{color:var(--accent)}
+.btn{display:inline-block;font-weight:700;padding:11px 22px;border-radius:999px;white-space:nowrap;text-decoration:none;text-align:center;background:#fff;color:var(--dark);transition:transform .2s}
+.btn:hover{transform:translateY(-1px)}
+
+/* обложка */
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(900px 500px at 85% 10%,#d6ebfa 0,transparent 60%),
+  linear-gradient(180deg,#fff 0,var(--bg) 100%)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding-top:56px;padding-bottom:56px}
+.kicker{font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(30px,4.6vw,60px);line-height:1.04;letter-spacing:-.02em;margin-top:16px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{color:var(--muted);margin-top:18px;max-width:50ch;font-size:17px}
+.facts{display:flex;gap:34px;margin-top:38px;flex-wrap:wrap}
+.facts b{display:block;font-family:var(--disp);font-size:28px;font-weight:700;line-height:1}
+.facts span{font-size:13px;color:var(--muted)}
+.stack{position:relative;height:440px}
+.pane{position:absolute;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(16,40,70,.28),0 0 0 1px rgba(16,40,70,.05);cursor:zoom-in;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.pane img{width:100%;height:100%;object-fit:cover;display:block}
+.pane.p1{width:52%;aspect-ratio:1;left:2%;top:4%;transform:rotate(-5deg)}
+.pane.p2{width:52%;aspect-ratio:1;right:0;top:16%;transform:rotate(4deg);z-index:2}
+.pane.p3{width:40%;aspect-ratio:1;left:22%;bottom:-2%;transform:rotate(-1deg);z-index:3}
+.pane:hover{transform:rotate(0) scale(1.04);z-index:5}
+
+/* разделы */
+.sec{display:flex;align-items:baseline;gap:8px 18px;flex-wrap:wrap;margin:56px 0 20px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.sec h2{font-family:var(--disp);font-size:clamp(19px,2.4vw,28px);font-weight:700;line-height:1.1;letter-spacing:-.01em}
+.sec p{color:var(--muted);font-size:14px;flex:1;min-width:200px}
+.sec .cnt{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px}
+.card{background:var(--panel);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;break-inside:avoid;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.card:hover{transform:translateY(-6px);box-shadow:0 2px 4px rgba(16,24,40,.04),0 28px 50px -16px rgba(16,40,70,.22)}
+.js .card.rv{opacity:0;transform:translateY(22px)}
+.js .card.rv.in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.ph{position:relative;aspect-ratio:1/1;background:#fff;cursor:zoom-in;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:contain;display:block;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.card:hover .ph img{transform:scale(1.08)}
+.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.75) 50%,transparent 60%);transform:translateX(-120%);pointer-events:none}
+.card:hover .ph::after{transform:translateX(120%);transition:transform .9s ease}
+.from{position:absolute;left:12px;bottom:12px;background:var(--dark);color:#fff;font-size:12px;font-weight:600;padding:6px 11px;border-radius:999px;z-index:1}
+.from b{font-family:var(--disp);font-weight:500;font-size:13px;margin:0 2px}
+.zoom{position:absolute;right:12px;bottom:12px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.95);color:var(--ink);display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.14);z-index:1;opacity:0;transform:scale(.8);transition:.25s}
+.card:hover .zoom{opacity:1;transform:none}
+.tag{position:absolute;left:12px;top:12px;z-index:1;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);padding:5px 10px;border-radius:999px}
+.tag.o{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:5px;flex:1;border-top:1px solid var(--line)}
+.name{font-size:17px;font-weight:800;line-height:1.25;letter-spacing:-.01em}
+.desc{font-size:13px;color:var(--muted)}
+
+table.pr{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;font-size:14px;font-variant-numeric:tabular-nums}
+.pr th{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;text-align:right;padding:0 8px 7px}
+.pr th:first-child,.pr td:first-child{text-align:left;padding-left:0}
+.pr td{padding:5px 8px;text-align:right;white-space:nowrap;font-weight:600;border-top:1px solid var(--line)}
+.pr td:first-child span{display:inline-block;min-width:54px;text-align:center;background:var(--bg);border-radius:8px;padding:3px 8px;font-weight:800;font-size:13px}
+.pr td.t{color:var(--accent-d);background:var(--soft);font-weight:800}
+.pr tr:first-child td.t{border-radius:8px 8px 0 0}.pr tr:last-child td.t{border-radius:0 0 8px 8px}
+.pr tr:only-child td.t{border-radius:8px}
+.pr .na{color:var(--muted);font-weight:500}
+.unit{font-size:11px;color:var(--muted);margin-top:8px}
+
+.notes{margin:64px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.note{background:var(--panel);border-radius:20px;padding:22px;box-shadow:var(--shadow);font-size:14px;color:var(--muted)}
+.note b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+
+.invite{margin:64px 0 0;background:var(--dark);color:#fff;border-radius:28px;padding:54px 48px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}
+.invite::before{content:"";position:absolute;right:-80px;top:-140px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,#0a7fd0 0,transparent 68%);opacity:.55}
+.invite h3{font-family:var(--disp);font-size:clamp(20px,2.6vw,32px);line-height:1.15;font-weight:700;max-width:22ch;position:relative}
+.invite p{color:#a9b4c0;margin-top:12px;max-width:52ch;position:relative}
+.invite p b{color:#fff}
+.invite .btn{position:relative}
+footer{padding:34px 0 60px;text-align:center;color:var(--muted);font-size:13px}
+
+/* просмотр фото */
+.lb{position:fixed;inset:0;z-index:50;background:rgba(8,10,12,.94);display:none;grid-template-columns:1fr 380px}
+.lb.on{display:grid}
+.stage{position:relative;overflow:hidden;display:grid;place-items:center;background:#fff;cursor:zoom-in;touch-action:none}
+.stage.z{cursor:zoom-out}
+.stage img{max-width:100%;max-height:100vh;object-fit:contain;transition:transform .3s ease;user-select:none;-webkit-user-drag:none}
+.side{background:var(--panel);padding:30px 26px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.side .lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
+.side .name{font-family:var(--disp);font-size:21px;font-weight:700;line-height:1.2;margin-top:6px}
+.side .hint{font-size:12px;color:var(--muted);margin-top:auto;padding-top:16px}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:rgba(16,20,24,.8);color:#fff;font-size:22px;display:grid;place-items:center}
+.nav.p{left:16px}.nav.n{right:16px}
+.x{position:fixed;top:14px;right:14px;z-index:51;width:40px;height:40px;border-radius:50%;background:var(--bg);font-size:18px}
+
+@media (max-width:900px){
+  .hero .wrap{grid-template-columns:1fr;padding-top:34px;padding-bottom:34px}
+  .stack{height:300px;order:-1}
+  .notes{grid-template-columns:1fr}
+  .invite{grid-template-columns:1fr;padding:36px 26px}
+  .lb{grid-template-columns:1fr;grid-template-rows:52vh 1fr}
+}
+@media (max-width:640px){
+  .wrap{padding:0 14px}
+  .top .wrap{gap:14px}.top a{font-size:14px}
+  .logo{height:28px}
+  .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .card{border-radius:14px}
+  .body{padding:10px 10px 12px}.name{font-size:14px}.desc{display:none}
+  .pr{font-size:12.5px}.pr th{font-size:9px;letter-spacing:0;padding:0 4px 6px}.pr td{padding:5px 4px}
+  .pr td:first-child span{min-width:0;padding:3px 6px;font-size:12px}
+  .from{font-size:11px;padding:5px 9px;left:8px;bottom:8px}.zoom{display:none}.tag{left:8px;top:8px}
+  .sec{margin-top:40px}.sec .cnt{display:none}
+  .facts{gap:22px}.facts b{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.js .card.rv{opacity:1;transform:none}}
+
+/* ---- PDF: страница открывается как index.html?print, лист A4 ---- */
+@page{size:A4;margin:8mm 0}
+.pdf body{width:210mm;margin:0 auto;background:#fff}
+.pdf .wrap{max-width:none;padding:0 9mm}
+.pdf .top{position:static;background:none;border:0;backdrop-filter:none}
+.pdf .top .wrap{height:12mm;gap:5mm}.pdf .top a{font-size:12px}
+.pdf .logo{height:9mm}
+.pdf .hero{background:linear-gradient(180deg,#eaf4fc 0,#fff 100%);margin:2mm 9mm 0;border-radius:5mm}
+.pdf .hero .wrap{grid-template-columns:1.15fr .85fr;padding:4mm 8mm;gap:6mm}
+.pdf .kicker{font-size:8px}
+.pdf .hero h1{font-size:27px;margin-top:3mm}
+.pdf .hero p{display:none}
+.pdf .facts{margin-top:5mm;gap:5mm;flex-wrap:nowrap}.pdf .facts b{font-size:15px}.pdf .facts span{font-size:8.5px}
+.pdf .stack{height:45mm}
+.pdf .pane{border-radius:3mm;box-shadow:0 0 0 1px #d8dde3;cursor:default}
+.pdf .sec{margin:5mm 0 2.5mm;padding-bottom:1.5mm;border-bottom-width:1.5px;break-after:avoid;break-inside:avoid}
+.pdf .sec h2{font-size:14px}.pdf .sec p{font-size:9.5px}.pdf .sec .cnt{font-size:9px}
+.pdf .grid{gap:2.5mm;grid-template-columns:repeat(var(--pc,3),1fr)}
+.pdf .card{box-shadow:none;border:1px solid #d5dbe2;border-radius:3mm;transform:none!important}
+.pdf .ph{aspect-ratio:var(--pa,5/4);cursor:default}
+.pdf .ph img{object-fit:cover}
+.pdf .ph::after,.pdf .zoom,.pdf .lb{display:none}
+.pdf .from{font-size:8.5px;padding:2.5px 7px;left:2mm;bottom:2mm}.pdf .from b{font-size:9px}
+.pdf .tag{font-size:7px;left:2mm;top:2mm;padding:3px 7px}
+.pdf .body{padding:2.2mm 2.6mm 2.4mm;gap:1px}
+.pdf .name{font-size:11.5px;line-height:1.2}
+.pdf .desc{font-size:8.5px}
+.pdf table.pr{font-size:10.5px;margin-top:1.6mm}
+.pdf .pr th{font-size:6.5px;padding:0 5px 3px;letter-spacing:.06em}
+.pdf .pr td{padding:2.2px 5px}
+.pdf .pr td:first-child span{font-size:9.5px;min-width:0;padding:1.5px 6px;border-radius:5px}
+.pdf .unit{display:none}
+.pdf .grid + .grid{margin-top:2.5mm}
+.pdf .grid.hz .card{flex-direction:row;align-items:stretch}
+.pdf .grid.hz .ph{flex:none;width:var(--ph);min-height:var(--ph);aspect-ratio:auto;align-self:stretch}
+.pdf .grid.hz .ph img{position:absolute;inset:0;object-fit:contain}
+.pdf .grid.hz .body{border-top:0;border-left:1px solid var(--line);justify-content:center;padding:2.5mm 3.5mm}
+.pdf .grid.hz .from{display:none}
+.pdf .grid.hz .name{font-size:12.5px}
+.pdf .grid.hz table.pr{font-size:11px}.pdf .grid.hz .pr td{padding:2.6px 6px}
+.pdf .notes{margin-top:5mm;gap:2.5mm;break-inside:avoid}
+.pdf .note{box-shadow:none;border:1px solid #d5dbe2;border-radius:3mm;padding:3mm;font-size:9px}.pdf .note b{font-size:10.5px;margin-bottom:2px}
+.pdf .invite{margin-top:4mm;padding:11mm 9mm;border-radius:4mm;break-inside:avoid}
+.pdf .invite h3{font-size:15px;max-width:none}.pdf .invite p{font-size:10px;margin-top:2mm}
+.pdf .invite .btn{padding:6px 16px;font-size:11px}
+.pdf footer{padding:3mm 0 0;font-size:8.5px}
+</style>
+<link rel="stylesheet" href="parts.css">
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <img class="logo" src="img/logo.png" alt="ЮГРОС — стекольная компания" width="143" height="36">
+  <span class="sp"></span>
+  <a data-phone></a>
+  <a class="site" href="https://yugros.ru" target="_blank" rel="noopener">yugros.ru</a>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <div>
+    <div class="kicker">Каталог партнёра · цены от <span data-date></span></div>
+    <h1>Стекло и&nbsp;зеркала <em>с&nbsp;ценами за&nbsp;м²</em></h1>
+    <p>Нажмите на фото, чтобы рассмотреть фактуру вблизи.</p>
+    <div class="facts">
+      <div><b id="fCount"></b><span>видов стекла и зеркал</span></div>
+      <div><b>4–12 мм</b><span>толщины в наличии</span></div>
+      <div><b>с 1995</b><span>года на рынке</span></div>
+    </div>
+  </div>
+  <div class="stack" id="stack"></div>
+</div></section>
+
+<main class="wrap">
+  <nav class="jump"><a class="on" href="#list">Стекло и зеркала</a><a href="#triplex">Триплекс</a><a href="#obrabotka">Обработка</a></nav>
+  <div id="list"></div>
+  <div id="tx-root" class="tx"></div>
+  <div id="ob-root" class="ob"></div>
+
+  <div class="notes">
+    <div class="note"><b>В резку</b>Стекло, раскроенное по вашим размерам. Минимальная цена — как за 0,06 м².</div>
+    <div class="note"><b>С закалкой</b>Закалённое стекло с полированной кромкой, без отверстий и вырезов.</div>
+    <div class="note"><b>Считается отдельно</b>Отверстия, вырезы, фрезерование, фацет, триплекс, печать и доставка, а также непрямоугольные изделия, изделия площадью менее 0,5 м² и более 5 м², весом более 100 кг — менеджер пришлёт точный расчёт.</div>
+  </div>
+
+  <div class="invite">
+    <div>
+      <h3>Истинная красота стекла раскрывается только вживую</h3>
+      <p>Приглашаем в шоу-рум, где представлен весь ассортимент. Сравните оттенки, фактуры и глубину лично. <b>Записаться на просмотр вы можете у вашего менеджера.</b></p>
+    </div>
+    <a class="btn" href="https://yugros.ru" target="_blank" rel="noopener">yugros.ru</a>
+  </div>
+</main>
+
+<footer><div class="wrap">ЮГРОС — стекло и зеркала с 1995 года · Краснодар · цены действительны на <span data-date></span></div></footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Просмотр фото">
+  <div class="stage" id="stage">
+    <img id="lbImg" alt="">
+    <button class="nav p" id="prev" aria-label="Предыдущее">‹</button>
+    <button class="nav n" id="next" aria-label="Следующее">›</button>
+  </div>
+  <aside class="side" id="side"></aside>
+  <button class="x" id="lbX" aria-label="Закрыть">✕</button>
+</div>
+
+<script src="data.js"></script>
+<script src="tx.js"></script>
+<script src="ob.js"></script>
+<script>
+const PRINT = /[?&]print\b/.test(location.search);   // ?print — вёрстка листа A4 для выгрузки в PDF
+document.documentElement.classList.add(PRINT ? "pdf" : "js");
+// PDF: раскладка рядов по разделам, подобрана так, чтобы листы A4 заполнялись без пустот.
+// {v:N, a} — N вертикальных карточек в ряд, a — пропорции фото; {h:N, ph} — N горизонтальных (фото слева, ph мм, цены справа):
+// позиции с длинной таблицей цен идут крупными горизонтальными карточками, с одной-двумя ценами — компактными.
+const PDF_LAYOUT = [
+  [{h:2, ph:43}, {h:2, ph:30}],
+  [{v:3, a:"4/3"}],
+  [{h:2, ph:40}, {h:2, ph:32}],
+  [{h:2, ph:36}, {h:2, ph:36}],
+  [{v:3, a:"5/4"}, {v:3, a:"5/4"}],
+  [{v:3, a:"1/1"}, {v:3, a:"1/1"}],
+  [{v:3, a:"1/1"}, {h:2, ph:36}],
+];
+const $ = s => document.querySelector(s);
+const fmt = v => v.toLocaleString("ru-RU").replace(/ /g, " ");
+const pad = n => String(n).padStart(2, "0");
+const thumb = f => PRINT ? `img/print/${pad(f)}.jpg` : `img/${pad(f)}_s.webp`;   // в PDF — JPEG, иначе файл раздувается
+const ALL = [];
+CAT.forEach((c, ci) => c.items.forEach(it => { it.ci = ci; it.mirror = c.mirror; it.id = ALL.length; ALL.push(it); }));
+
+document.querySelectorAll("[data-date]").forEach(e => e.textContent = PRICE_DATE);
+document.querySelectorAll("[data-phone]").forEach(e => { e.textContent = PHONE.text; e.href = PHONE.href; });
+$("#fCount").textContent = ALL.length;
+$("#stack").innerHTML = [[24, "p1"], [1, "p2"], [11, "p3"]].map(([f, c]) => {
+  const it = ALL.find(i => i.f === f);
+  return `<div class="pane ${c}" data-open="${it.id}"><img src="${thumb(f)}" alt="${it.n}" width="560" height="560"></div>`;
+}).join("");
+
+function minPrice(it) {
+  const v = Object.values(it.p).filter(Boolean).map(x => x[0]);
+  return v.length ? Math.min(...v) : null;
+}
+function priceTable(it) {
+  const rows = Object.keys(it.p).map(t => {
+    const v = it.p[t];
+    const cut = v ? fmt(v[0]) : '<span class="na">по запросу</span>';
+    const tmp = v && v[1] ? fmt(v[1]) : '<span class="na">—</span>';
+    return `<tr><td><span>${t} мм</span></td><td>${cut}</td>` + (it.mirror ? "" : `<td class="t">${tmp}</td>`) + "</tr>";
+  }).join("");
+  return `<table class="pr"><thead><tr><th>Толщина</th><th>В резку</th>${it.mirror ? "" : "<th>С закалкой</th>"}</tr></thead><tbody>${rows}</tbody></table><div class="unit">₽ за м² · прайс партнёра от ${PRICE_DATE}</div>`;
+}
+const plural = n => n % 10 === 1 && n % 100 !== 11 ? "позиция" : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "позиции" : "позиций");
+
+function card(it) {
+  const m = minPrice(it);
+  return `
+    <article class="card rv">
+      <div class="ph" data-open="${it.id}">
+        <img src="${thumb(it.f)}" alt="${it.n}" ${PRINT ? "" : 'loading="lazy" decoding="async"'} width="560" height="560">
+        ${it.tag ? `<span class="tag${it.tag === "Акция" ? "" : " o"}">${it.tag}</span>` : ""}
+        ${m ? `<span class="from">от <b>${fmt(m)}</b> ₽/м²</span>` : `<span class="from">цена по запросу</span>`}
+        <span class="zoom" aria-hidden="true">⤢</span>
+      </div>
+      <div class="body">
+        <div class="name">${it.n}</div>
+        <div class="desc">${it.d}</div>
+        ${priceTable(it)}
+      </div>
+    </article>`;
+}
+$("#list").innerHTML = CAT.map((c, ci) => {
+  const head = `<div class="sec"><h2>${c.g}</h2><p>${c.lead}</p></div>`;
+  if (!PRINT) return head + `<div class="grid">${c.items.map(card).join("")}</div>`;
+  let i = 0;
+  return head + (PDF_LAYOUT[ci] || [{v: 3, a: "5/4"}]).map(r => {
+    const n = r.h || r.v, items = c.items.slice(i, i + n); i += n;
+    return `<div class="grid${r.h ? " hz" : ""}" style="--pc:${n};--pa:${r.a || "1/1"};--ph:${r.ph || 0}mm">${items.map(card).join("")}</div>`;
+  }).join("");
+}).join("");
+
+if (!PRINT && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), {rootMargin: "0px 0px -6% 0px"});
+  document.querySelectorAll(".card.rv").forEach(c => io.observe(c));
+} else document.querySelectorAll(".card.rv").forEach(c => c.classList.add("in"));
+
+// ---- просмотр фото ----
+let cur = -1;
+const stage = $("#stage"), lbImg = $("#lbImg");
+function show(id) {
+  cur = id; const it = ALL[id];
+  stage.classList.remove("z"); lbImg.style.transform = "";
+  lbImg.src = `img/${pad(it.f)}_s.webp`;           // мгновенно — превью, затем большое фото
+  const big = new Image(); big.onload = () => { if (cur === id) lbImg.src = big.src; }; big.src = `img/${pad(it.f)}.webp`;
+  lbImg.alt = it.n;
+  $("#side").innerHTML = `
+    <span class="lbl">${CAT[it.ci].g}</span>
+    <div class="name">${it.n}</div>
+    <div class="desc">${it.d}</div>
+    ${priceTable(it)}
+    <div class="hint">Нажмите на фото — увеличение ×2,5. Листайте стрелками ← → или свайпом.</div>`;
+}
+function openLb(id) { $("#lb").classList.add("on"); document.body.style.overflow = "hidden"; show(id); }
+function closeLb() { $("#lb").classList.remove("on"); document.body.style.overflow = ""; cur = -1; }
+function step(d) { show((cur + d + ALL.length) % ALL.length); }
+function pan(e) {
+  const r = stage.getBoundingClientRect();
+  lbImg.style.transformOrigin = ((e.clientX - r.left) / r.width * 100) + "% " + ((e.clientY - r.top) / r.height * 100) + "%";
+}
+if (!PRINT) document.addEventListener("click", e => { const el = e.target.closest("[data-open]"); if (el) openLb(+el.dataset.open); });
+let sx = null;
+stage.addEventListener("pointerdown", e => { sx = e.clientX; });
+stage.addEventListener("pointerup", e => {
+  if (e.target.closest(".nav")) return;
+  if (sx !== null && Math.abs(e.clientX - sx) > 50 && !stage.classList.contains("z")) { step(e.clientX < sx ? 1 : -1); return; }
+  pan(e); const z = stage.classList.toggle("z"); lbImg.style.transform = z ? "scale(2.5)" : "";
+});
+stage.addEventListener("pointermove", e => { if (stage.classList.contains("z")) pan(e); });
+$("#prev").onclick = () => step(-1); $("#next").onclick = () => step(1); $("#lbX").onclick = closeLb;
+document.addEventListener("keydown", e => {
+  if (cur < 0) return;
+  if (e.key === "Escape") closeLb();
+  if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1);
+});
+</script>
+<script src="layout.js"></script>
+</body>
+</html>

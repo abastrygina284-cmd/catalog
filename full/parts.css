@@ -1,0 +1,159 @@
+/* Общие стили разделов «Триплекс» (.tx) и «Обработка» (.ob).
+   Подключается и на отдельных страницах (triplex.html, obrabotka.html), и в общем каталоге (index.html). */
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --ink:#101418; --muted:#66707c; --line:#e1e6ec;
+  --accent:#0a7fd0; --accent-d:#0868ab; --soft:#e6f2fb; --dark:#0f1318;
+  --glass:#d7edf4; --glass-d:#8fbdd0;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 12px 32px -8px rgba(16,24,40,.10);
+  --disp:"Unbounded","Segoe UI",system-ui,sans-serif;
+  --text:"Manrope","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+
+/* ---- каркас отдельной страницы (в общем каталоге эти правила уже есть в index.html) ---- */
+.solo *{box-sizing:border-box;margin:0;padding:0}
+body.solo{font-family:var(--text);background:var(--bg);color:var(--ink);line-height:1.45;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.solo a{color:inherit}
+.solo .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.solo .top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.86);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.solo .top .wrap{display:flex;align-items:center;gap:22px;height:66px}
+.solo .logo{height:36px;display:block}
+.solo .top .sp{flex:1}
+.solo .top a{font-weight:700;text-decoration:none;white-space:nowrap}
+.solo .top a.site{color:var(--accent)}
+.solo footer{padding:34px 0 60px;text-align:center;color:var(--muted);font-size:13px}
+.solo .sec{display:flex;align-items:baseline;gap:8px 18px;flex-wrap:wrap;margin:56px 0 20px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.solo .sec h2{font-family:var(--disp);font-size:clamp(19px,2.4vw,28px);font-weight:700;line-height:1.1;letter-spacing:-.01em}
+.solo .sec p{color:var(--muted);font-size:14px;flex:1;min-width:200px}
+.solo .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px}
+.solo .card{background:var(--panel);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;break-inside:avoid}
+.solo .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:5px;flex:1;border-top:1px solid var(--line)}
+.solo .name{font-size:17px;font-weight:800;line-height:1.25;letter-spacing:-.01em}
+.solo .desc{font-size:13px;color:var(--muted)}
+.solo .tag{position:absolute;left:12px;top:12px;z-index:1;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);padding:5px 10px;border-radius:999px}
+.solo .tag.o{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.solo .kicker{font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+
+/* ---- переход между каталогами ---- */
+.jump{display:flex;gap:10px;flex-wrap:wrap;padding:18px 0 0}
+.jump a{font-weight:700;font-size:14px;text-decoration:none;background:#fff;border-radius:999px;padding:9px 18px;box-shadow:var(--shadow);white-space:nowrap}
+.jump a.on{background:var(--dark);color:#fff}
+
+/* ---- шапка раздела ---- */
+.part{margin-top:72px;background:radial-gradient(700px 380px at 88% 0,#d6ebfa 0,transparent 62%),#fff;border-radius:24px;padding:26px 34px;display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;overflow:hidden;scroll-margin-top:84px}
+.part.one{grid-template-columns:1fr}
+.part h2{font-family:var(--disp);font-weight:700;font-size:clamp(22px,2.8vw,34px);line-height:1.06;letter-spacing:-.02em;margin-top:14px}
+.part h2 em{font-style:normal;color:var(--accent)}
+.part p{color:var(--muted);margin-top:10px;max-width:56ch;font-size:15px}
+.solo .part{margin-top:28px}
+
+/* ---- триплекс ---- */
+.iso{position:relative;height:var(--h,200px);perspective:1400px}
+.iso .st{position:absolute;left:50%;top:50%;width:var(--w,150px);height:var(--w,150px);margin:calc(var(--w,150px)/-2) 0 0 calc(var(--w,150px)/-2);transform:rotateX(58deg) rotateZ(42deg);transform-style:preserve-3d}
+.ly{position:absolute;inset:0;border-radius:6px;transform:translateZ(calc(var(--z)*var(--gap,22px)));box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75),0 0 0 1px rgba(40,60,80,.22)}
+.ly.glass{background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,0) 45%),var(--c,rgba(205,232,240,.5))}
+.ly.lam{background:var(--c,rgba(140,190,235,.55));box-shadow:0 0 0 1px rgba(40,60,80,.3);border-radius:4px}
+.ly.mirror{background:linear-gradient(135deg,#f4f6f8 0,#b9c2cb 38%,#eef1f4 55%,#9aa5b0 100%)}
+.part .iso{--h:200px;--w:120px;--gap:30px}
+.lbl{position:absolute;right:0;font-size:12px;font-weight:700;background:#fff;border-radius:999px;padding:6px 14px;box-shadow:var(--shadow);white-space:nowrap}
+.lbl i{font-style:normal;color:var(--muted);font-weight:500}
+.lbl.a{top:8%}.lbl.b{top:42%;color:var(--accent-d)}.lbl.c{top:76%}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.kind{background:var(--panel);border-radius:20px;box-shadow:var(--shadow);padding:26px}
+.kind.t{background:var(--dark);color:#fff}
+.kind h3{font-family:var(--disp);font-size:22px;font-weight:700}
+.kind .of{margin-top:6px;font-size:14px;color:var(--muted)}
+.kind.t .of{color:#a9b4c0}
+.kind ul{list-style:none;margin-top:16px;display:grid;gap:8px;font-size:15px;padding:0}
+.kind li{padding-left:20px;position:relative}
+.kind li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+.spec{display:grid;grid-template-columns:repeat(3,1fr);background:var(--panel);border-radius:20px;box-shadow:var(--shadow);margin-top:20px;overflow:hidden}
+.spec>div{padding:18px 22px;border-left:1px solid var(--line)}
+.spec>div:first-child{border-left:0}
+.spec h3{font-family:var(--disp);font-size:15px;font-weight:700}
+.spec .of{font-size:12.5px;color:var(--muted);margin-top:3px}
+.spec ul{list-style:none;padding:0;margin-top:10px;display:grid;gap:5px;font-size:13.5px}
+.spec li{padding-left:14px;position:relative}
+.spec li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+.tx .card .iso{background:#fff;--h:210px;--w:140px;--gap:20px}
+.tx .ph,.ob .ph{position:relative;aspect-ratio:1/1;background:#fff;cursor:default;overflow:hidden}
+.tx .ph img,.ob .ph img{width:100%;height:100%;object-fit:contain;display:block}
+.tx .ph .tag,.ob .ph .tag{top:auto;bottom:12px}
+.zn{position:absolute;top:2.5%;z-index:1;font-size:11px;font-weight:700;line-height:1.15;background:rgba(255,255,255,.92);border-radius:8px;padding:3px 7px;box-shadow:0 1px 4px rgba(16,24,40,.14);max-width:19%;text-align:center;transform:translateX(-50%)}
+.zn.a{left:22.2%}.zn.b{left:59.5%}.zn.ab{left:40.8%;top:10%;max-width:none;background:var(--accent);color:#fff;white-space:nowrap}
+.sum{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:#fafbfc}
+.sum img,.sum .chip{width:62px;height:62px;border-radius:12px;object-fit:cover;box-shadow:inset 0 0 0 1px var(--line);background:#fff}
+.sum .chip{box-shadow:inset 0 0 0 1px rgba(16,24,40,.14)}
+.sum b{font-family:var(--disp);font-size:16px;color:var(--muted);font-weight:500}
+.sum figure{text-align:center;font-size:10.5px;color:var(--muted);font-weight:600;line-height:1.2;width:74px;margin:0}
+.sum figure img,.sum figure .chip{display:block;margin:0 auto 4px}
+.fls{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px}
+.fl{background:var(--panel);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;font-size:12.5px;font-weight:700;line-height:1.25}
+.fl i{display:block;aspect-ratio:4/3;background:linear-gradient(135deg,rgba(255,255,255,.45),rgba(255,255,255,0) 50%),var(--c);box-shadow:inset 0 -1px 0 var(--line)}
+.fl span{display:block;padding:9px 11px 11px}
+.fl small{display:block;color:var(--muted);font-weight:500;font-size:11px}
+.grp{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:22px 0 10px}
+.fine{font-size:12px;color:var(--muted);margin-top:14px}
+
+/* ---- обработка ---- */
+.ob .pic{aspect-ratio:4/3;background:#fff;display:grid;place-items:center;padding:18px;position:relative}
+.ob .pic svg{width:100%;height:100%}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.opts span{background:var(--bg);border-radius:8px;padding:3px 9px;font-weight:700;font-size:12.5px}
+
+@media (max-width:900px){
+  .part{grid-template-columns:1fr;padding:30px 22px;margin-top:48px}
+  .part .iso{--h:260px;--w:150px;--gap:38px}
+  .two{grid-template-columns:1fr}
+  .spec{grid-template-columns:1fr}.spec>div{border-left:0;border-top:1px solid var(--line)}.spec>div:first-child{border-top:0}
+}
+@media (max-width:640px){
+  .solo .wrap{padding:0 14px}
+  .solo .top .wrap{gap:14px}.solo .top a{font-size:14px}
+  .solo .logo{height:28px}
+  .solo .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .solo .card{border-radius:14px}.solo .body{padding:10px 10px 12px}.solo .name{font-size:14px}
+  .solo .sec{margin-top:40px}
+  .lbl{font-size:11px;padding:5px 10px}
+  .zn{font-size:9px;padding:2px 4px}
+  .sum{gap:4px;padding:8px 6px}.sum img,.sum .chip{width:44px;height:44px}.sum figure{width:54px;font-size:9px}
+  .opts span{font-size:11px;padding:2px 6px}
+  .jump a{font-size:13px;padding:8px 14px}
+}
+/* PDF общего каталога (index.html?print, лист A4): разделы «Триплекс» и «Обработка» начинаются с новой страницы */
+.pdf .jump{display:none}
+.pdf .part{margin:0;border-radius:4mm;padding:5mm 6mm;break-before:page;grid-template-columns:1.3fr .7fr;gap:4mm;background:linear-gradient(180deg,#eaf4fc 0,#fff 100%)}
+.pdf .part.one{grid-template-columns:1fr}
+.pdf .part h2{font-size:18px;margin-top:2mm}
+.pdf .part p{font-size:9.5px;margin-top:2mm;max-width:none}
+.pdf .part .iso{--h:30mm;--w:18mm;--gap:4.5mm}
+.pdf .lbl{font-size:7px;padding:2px 6px;box-shadow:0 0 0 1px #d5dbe2}
+.pdf .spec{box-shadow:none;border:1px solid #d5dbe2;border-radius:3mm;margin-top:3mm;break-inside:avoid}
+.pdf .spec{grid-template-columns:repeat(3,1fr)}
+.pdf .spec>div{padding:2.5mm 3mm;border-top:0;border-left:1px solid var(--line)}
+.pdf .spec>div:first-child{border-left:0}
+.pdf .spec h3{font-size:10px}.pdf .spec .of{font-size:8px;margin-top:1px}
+.pdf .spec ul{font-size:8.5px;gap:1.5px;margin-top:1.5mm}
+.pdf .spec li{padding-left:9px}.pdf .spec li::before{width:4px;height:4px}
+.pdf .tx .ph,.pdf .ob .ph{aspect-ratio:1/1}
+.pdf .tx .ph img,.pdf .ob .ph img{object-fit:contain}
+.pdf .tx .ph .tag,.pdf .ob .ph .tag{top:auto;bottom:1.5mm;left:1.5mm;font-size:5.5px;padding:2px 5px}
+.pdf .tx .card .iso{--h:30mm;--w:19mm;--gap:3mm}
+.pdf .zn{font-size:5.5px;padding:1px 3px;border-radius:3px;box-shadow:0 0 0 .5px #cfd6dd}
+.pdf .sum{padding:1.2mm;gap:1.2mm}
+.pdf .sum img,.pdf .sum .chip{width:8mm;height:8mm;border-radius:1.5mm}
+.pdf .sum figure{width:12mm;font-size:5.5px}
+.pdf .sum figure img,.pdf .sum figure .chip{margin-bottom:1px}
+.pdf .sum b{font-size:8px}
+.pdf .tx .name,.pdf .ob .name{font-size:10px}
+.pdf .tx .desc,.pdf .ob .desc{font-size:7.5px}
+.pdf .tx .body,.pdf .ob .body{padding:1.8mm 2.2mm 2mm}
+.pdf .opts{gap:2px;margin-top:1.2mm}
+.pdf .opts span{font-size:6.5px;padding:1px 4px;border-radius:3px}
+.pdf .fls{grid-template-columns:repeat(7,1fr);gap:2mm}
+.pdf .fl{box-shadow:none;border:1px solid #d5dbe2;border-radius:2mm;font-size:7.5px;break-inside:avoid}
+.pdf .fl span{padding:1.2mm 1.5mm}.pdf .fl small{font-size:6.5px}
+.pdf .grp{font-size:7.5px;margin:3mm 0 1.5mm;break-after:avoid}
+.pdf .fine{font-size:7.5px;margin-top:2mm}
