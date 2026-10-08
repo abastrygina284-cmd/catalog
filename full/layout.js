@@ -49,6 +49,10 @@
     document.head.appendChild(pg);
     document.documentElement.setAttribute("data-long-mm", mm);
   }
+  // Защита фото от простого копирования: нельзя перетащить картинку и вызвать на ней меню «Сохранить как».
+  // Это защита от случайного копирования, а не от снимка экрана — основная защита — водяные знаки на самих фото.
+  document.addEventListener("contextmenu", function (e) { if (e.target.tagName === "IMG") e.preventDefault(); });
+  document.addEventListener("dragstart", function (e) { if (e.target.tagName === "IMG") e.preventDefault(); });
   balance();
   window.addEventListener("resize", balance);
   if (document.documentElement.classList.contains("pdf") && /[?&]long\b/.test(location.search)) {
