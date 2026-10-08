@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Редактор каталога — ЮГРОС</title>
+<style>
+/* Редактор каталога ЮГРОС. Вход — по личному ключу GitHub (fine-grained token, право Contents: Read and write на репозиторий catalog).
+   Ключ хранится только в браузере и отправляется только на api.github.com. Сторонних скриптов на странице нет.
+   Что пишет: data.js и full/data.js (стекло и цены, оба каталога), full/tx-data.js, full/ob-data.js, новые фото в img/ и full/img/. */
+:root{--bg:#eef1f5;--panel:#fff;--ink:#101418;--muted:#66707c;--line:#dfe5eb;--accent:#0a7fd0;--soft:#e6f2fb;--bad:#c62828;--ok:#1b7f3b}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.4 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,textarea,select{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 120px}
+h1{font-size:22px;margin:22px 0 4px}
+h2{font-size:18px;margin:0}
+.muted{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.p{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn.d{color:var(--bad)}
+.btn.s{padding:3px 9px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=password],textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:#fff}
+textarea{resize:vertical;min-height:38px}
+input:focus,textarea:focus{outline:2px solid var(--soft);border-color:var(--accent)}
+label.f{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:8px 0 3px}
+.login{max-width:520px;margin:9vh auto 0;background:var(--panel);border-radius:16px;padding:26px;box-shadow:0 12px 32px -12px rgba(16,24,40,.2)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tabs .btn.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.box{background:var(--panel);border-radius:14px;padding:16px;margin:14px 0;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.box>.hd{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.box>.hd h2{flex:1;min-width:160px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 14px}
+.item{display:grid;grid-template-columns:96px 1fr auto;gap:12px;border-top:1px solid var(--line);padding:12px 0;align-items:start}
+.item.hid{opacity:.5}
+.item img{width:96px;height:96px;object-fit:cover;border-radius:10px;background:#f3f5f7;border:1px solid var(--line);display:block}
+.item .tools{display:flex;flex-direction:column;gap:5px;align-items:stretch}
+.pr{border-collapse:collapse;margin-top:6px}
+.pr th{font-size:11px;color:var(--muted);text-align:left;padding:0 6px 2px 0}
+.pr td{padding:2px 6px 2px 0}
+.pr input{width:104px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;z-index:5}
+#msg{font-size:14px}
+#msg.bad{color:var(--bad)}#msg.ok{color:var(--ok)}
+.chk{display:flex;gap:6px;align-items:center;font-size:13px}
+@media (max-width:700px){.row2,.row3{grid-template-columns:1fr}.item{grid-template-columns:72px 1fr}.item img{width:72px;height:72px}.item .tools{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+const OWNER = "abastrygina284-cmd", REPO = "catalog", BRANCH = "main";
+const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/`;
+const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);   // проверка на своём компьютере: читает файлы рядом, сохранять не может
+const SITE = `https://${OWNER}.github.io/${REPO}/full/`;
+let TOKEN = "", S = null, TAB = "glass", DIRTY = {glass: false, tx: false, ob: false}, UPLOADS = [];   // UPLOADS: [{path, blob}]
+
+// ---------- мелкие помощники ----------
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const k in (attrs || {})) {
+    const v = attrs[k];
+    if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (k === "value" || k === "checked" || k === "disabled") e[k] = v; else if (v != null) e.setAttribute(k, v);
+  }
+  kids.flat(Infinity).forEach(c => { if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(c)); });
+  return e;
+}
+const pad = n => String(n).padStart(2, "0");
+function say(text, cls) { const m = document.getElementById("msg"); if (m) { m.textContent = text; m.className = cls || ""; } }
+function touch(part) { DIRTY[part] = true; say("Есть несохранённые изменения", ""); }
+// поле ввода, связанное с obj[key]; ta — многострочное; lines — массив строк (по одной в строке поля)
+function field(label, obj, key, part, o) {
+  o = o || {};
+  const val = o.lines ? (obj[key] || []).join("\n") : (obj[key] == null ? "" : obj[key]);
+  const inp = h(o.ta || o.lines ? "textarea" : "input", {type: "text", value: val, rows: o.rows || (o.lines ? 3 : 2), placeholder: o.ph || "",
+    oninput: e => { obj[key] = o.lines ? e.target.value.split("\n").map(s => s.trim()).filter(Boolean) : e.target.value; touch(part); }});
+  if (o.ta || o.lines) inp.value = val;
+  return h("div", null, h("label", {class: "f"}, label), inp);
+}
+function move(list, i, d, part) { const j = i + d; if (j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; touch(part); render(); }
+function tools(list, i, part, obj, what) {
+  return h("div", {class: "tools"},
+    h("label", {class: "chk"}, h("input", {type: "checkbox", checked: !!obj.hide, onchange: e => { if (e.target.checked) obj.hide = 1; else delete obj.hide; touch(part); render(); }}), "Скрыть"),
+    h("button", {class: "btn s", onclick: () => move(list, i, -1, part)}, "↑ выше"),
+    h("button", {class: "btn s", onclick: () => move(list, i, 1, part)}, "↓ ниже"),
+    h("button", {class: "btn s d", onclick: () => { if (confirm("Удалить «" + (obj.n || obj.g || obj.title || what) + "» насовсем? Чтобы временно убрать с сайта, лучше поставить «Скрыть».")) { list.splice(i, 1); touch(part); render(); } }}, "Удалить"));
+}
+
+// ---------- GitHub ----------
+async function gh(path, opt) {
+  const r = await fetch(API + path + (opt ? "" : "?ref=" + BRANCH + "&t=" + Date.now()),
+    Object.assign({headers: Object.assign({Accept: "application/vnd.github+json", Authorization: "Bearer " + TOKEN}, opt ? {"Content-Type": "application/json"} : {})}, opt || {}));
+  if (!r.ok) {
+    const t = await r.text(); let why = t.slice(0, 160);
+    if (r.status === 401) why = "ключ не принят (неверный или истёк срок)";
+    if (r.status === 403) why = "у ключа нет права записи в репозиторий catalog (нужно Contents: Read and write)";
+    const e = new Error(r.status + ": " + why); e.status = r.status; throw e;
+  }
+  return r.json();
+}
+function fromB64(s) { return new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, "")), c => c.charCodeAt(0))); }
+function toB64(bytes) { let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); }
+async function readText(path) {
+  if (LOCAL) return (await fetch(path.replace(/^full\//, "") + "?t=" + Date.now())).text();
+  return fromB64((await gh(path)).content);
+}
+async function put(path, bytes, message) {
+  let sha;
+  try { sha = (await gh(path)).sha; } catch (e) { if (e.status !== 404) throw e; }
+  await gh(path, {method: "PUT", body: JSON.stringify(Object.assign({message, content: toB64(bytes), branch: BRANCH}, sha ? {sha} : {}))});
+}
+function evalData(text) { const w = {}; new Function("window", text)(w); return w; }
+
+// ---------- картинки: приводим к квадрату на белом фоне, ставим водяной знак, сохраняем в WebP ----------
+async function makeImage(file, size) {
+  const bmp = await createImageBitmap(file), c = document.createElement("canvas"), x = c.getContext("2d");
+  c.width = c.height = size;
+  x.fillStyle = "#fff"; x.fillRect(0, 0, size, size);
+  const k = Math.min(size / bmp.width, size / bmp.height), w = bmp.width * k, hh = bmp.height * k;
+  x.imageSmoothingQuality = "high"; x.drawImage(bmp, (size - w) / 2, (size - hh) / 2, w, hh);
+  x.save(); x.translate(size / 2, size / 2); x.rotate(-Math.PI / 6);
+  x.font = "bold " + Math.round(size * 0.042) + "px Arial"; x.fillStyle = "rgba(120,128,136,.27)"; x.strokeStyle = "rgba(255,255,255,.43)"; x.lineWidth = Math.max(1, size / 700);
+  const words = ["ЮГРОС", "www.yugros.ru", "yugros_"]; let n = 0;
+  for (let row = 0, y = -size; y < size; y += size * 0.17, row++)
+    for (let px = -size - (row % 2) * size * 0.23; px < size; px += size * 0.46) { const t = words[n++ % 3]; x.strokeText(t, px, y); x.fillText(t, px, y); }
+  x.restore();
+  const blob = await new Promise(res => c.toBlob(res, "image/webp", 0.85));
+  if (!blob || blob.type !== "image/webp") throw new Error("этот браузер не умеет сохранять WebP — откройте редактор в Chrome, Яндекс Браузере или Edge");
+  return blob;
+}
+function queue(path, blob) { UPLOADS = UPLOADS.filter(u => u.path !== path); UPLOADS.push({path, blob}); }
+function photoBtn(label, handler) {
+  const inp = h("input", {type: "file", accept: "image/*", style: "display:none", onchange: async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { say("Готовлю фото…"); await handler(f); render(); } catch (err) { say("Фото не добавлено: " + err.message, "bad"); }
+  }});
+  return h("span", null, inp, h("button", {class: "btn s", onclick: () => inp.click()}, label));
+}
+
+// ---------- вход ----------
+function showLogin(err) {
+  const key = h("input", {type: "password", placeholder: "github_pat_…", autocomplete: "off"});
+  const rem = h("input", {type: "checkbox"});
+  const go = async () => {
+    TOKEN = key.value.trim();
+    if (!TOKEN && !LOCAL) return showLogin("Введите ключ.");
+    try {
+      if (!LOCAL) await gh("full/data.js");
+      if (rem.checked) localStorage.setItem("yugros_key", TOKEN); else sessionStorage.setItem("yugros_key", TOKEN);
+      await load();
+    } catch (e) { TOKEN = ""; localStorage.removeItem("yugros_key"); sessionStorage.removeItem("yugros_key"); showLogin("Не получилось войти — " + e.message); }
+  };
+  key.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  document.getElementById("app").replaceChildren(h("div", {class: "login"},
+    h("h1", {style: "margin-top:0"}, "Редактор каталога ЮГРОС"),
+    h("p", {class: "muted"}, LOCAL ? "Проверочный режим на этом компьютере: данные читаются из файлов рядом, сохранение отключено. Ключ не нужен." : "Введите личный ключ GitHub. Он хранится только в этом браузере и отправляется только на GitHub."),
+    h("label", {class: "f"}, "Ключ"), key,
+    h("label", {class: "chk", style: "margin:10px 0"}, rem, "Запомнить на этом устройстве (не ставьте на чужом компьютере)"),
+    err ? h("p", {style: "color:var(--bad)"}, err) : null,
+    h("button", {class: "btn p", onclick: go}, "Войти")));
+  key.focus();
+}
+async function load() {
+  document.getElementById("app").replaceChildren(h("div", {class: "login"}, "Загружаю каталог…"));
+  const g = evalData(await readText("full/data.js"));
+  S = {glass: {date: g.PRICE_DATE || "", phone: g.PHONE || {text: "", href: ""}, cat: g.CAT_ALL || g.CAT},
+       tx: evalData(await readText("full/tx-data.js")).TXD, ob: evalData(await readText("full/ob-data.js")).OBD};
+  DIRTY = {glass: false, tx: false, ob: false}; UPLOADS = [];
+  render();
+}
+
+// ---------- стекло и цены ----------
+function rowsOf(it) {   // цены в виде строк таблицы; обратно в it.p собирает syncPrices
+  if (!it.__rows) it.__rows = Object.keys(it.p || {}).map(t => ({t, c: it.p[t] && it.p[t][0] != null ? it.p[t][0] : "", h: it.p[t] && it.p[t][1] != null ? it.p[t][1] : ""}));
+  return it.__rows;
+}
+const num = v => { const n = parseInt(String(v).replace(/\D/g, ""), 10); return isNaN(n) ? null : n; };
+function syncPrices(it) {
+  it.p = {};
+  it.__rows.forEach(r => { const t = num(r.t); if (t == null) return; const c = num(r.c); it.p[t] = c == null ? null : [c, num(r.h)]; });
+  touch("glass");
+}
+function glassItem(g, it, i) {
+  const rows = rowsOf(it);
+  const cell = (r, k, ph) => h("input", {type: "text", value: r[k], placeholder: ph, inputmode: "numeric", oninput: e => { r[k] = e.target.value; syncPrices(it); }});
+  const table = h("table", {class: "pr"},
+    h("tr", null, h("th", null, "Толщина, мм"), h("th", null, "В резку, ₽/м²"), g.mirror ? null : h("th", null, "С закалкой, ₽/м²"), h("th")),
+    rows.map((r, ri) => h("tr", null, h("td", null, cell(r, "t", "мм")), h("td", null, cell(r, "c", "по запросу")), g.mirror ? null : h("td", null, cell(r, "h", "—")),
+      h("td", null, h("button", {class: "btn s d", title: "Убрать толщину", onclick: () => { rows.splice(ri, 1); syncPrices(it); render(); }}, "✕")))),
+    h("tr", null, h("td", {colspan: 4}, h("button", {class: "btn s", onclick: () => { rows.push({t: "", c: "", h: ""}); render(); }}, "+ толщина"))));
+  return h("div", {class: "item" + (it.hide ? " hid" : "")},
+    h("div", null, h("img", {src: it.__preview || `img/${pad(it.f)}_s.webp`, alt: ""}),
+      photoBtn("Заменить фото", async f => { await glassPhoto(it, f); })),
+    h("div", null,
+      h("div", {class: "row2"}, field("Название", it, "n", "glass"), field("Метка на фото (Акция, Под заказ — или пусто)", it, "tag", "glass")),
+      field("Короткое описание", it, "d", "glass"), table),
+    tools(g.items, i, "glass", it, "позицию"));
+}
+async function glassPhoto(it, file) {
+  const big = await makeImage(file, 1400), small = await makeImage(file, 560);
+  ["", "full/"].forEach(pre => { queue(`${pre}img/${pad(it.f)}.webp`, big); queue(`${pre}img/${pad(it.f)}_s.webp`, small); });
+  it.__preview = URL.createObjectURL(small); touch("glass");
+}
+function viewGlass() {
+  const G = S.glass, all = G.cat.flatMap(g => g.items);
+  return [h("div", {class: "box"}, h("div", {class: "row2"}, field("Дата прайса (показывается в каталоге)", G, "date", "glass"), field("Телефон в шапке", G.phone, "text", "glass")),
+      h("p", {class: "muted"}, "Пустая цена «в резку» = «по запросу». Скрытая позиция остаётся в редакторе, но не видна в каталоге.")),
+    G.cat.map((g, gi) => h("div", {class: "box"},
+      h("div", {class: "hd"}, h("h2", null, g.g), h("span", {class: "muted"}, g.items.filter(i => !i.hide).length + " из " + g.items.length + " на сайте"),
+        h("button", {class: "btn s", onclick: () => move(G.cat, gi, -1, "glass")}, "↑ раздел"), h("button", {class: "btn s", onclick: () => move(G.cat, gi, 1, "glass")}, "↓ раздел"),
+        h("button", {class: "btn s d", onclick: () => { if (!g.items.length || confirm("Удалить раздел «" + g.g + "» со всеми позициями?")) { G.cat.splice(gi, 1); touch("glass"); render(); } }}, "Удалить раздел")),
+      h("div", {class: "row2"}, field("Название раздела", g, "g", "glass"), field("Пояснение под заголовком", g, "lead", "glass")),
+      h("label", {class: "chk", style: "margin-top:8px"}, h("input", {type: "checkbox", checked: !!g.mirror, onchange: e => { if (e.target.checked) g.mirror = 1; else delete g.mirror; touch("glass"); render(); }}), "Раздел без закалки (зеркала, лакобель) — показывать только цену «в резку»"),
+      g.items.map((it, i) => glassItem(g, it, i)),
+      h("div", {style: "border-top:1px solid var(--line);padding-top:12px"}, photoBtn("+ Добавить позицию (сначала выберите фото)", async f => {
+        const it = {n: "Новая позиция", d: "", f: Math.max(0, ...all.map(i => i.f || 0)) + 1, p: {4: null}};
+        await glassPhoto(it, f); g.items.push(it);
+      })))),
+    h("div", {class: "box"}, h("button", {class: "btn", onclick: () => { G.cat.push({g: "Новый раздел", s: "Новый", lead: "", items: []}); touch("glass"); render(); }}, "+ Добавить раздел"))];
+}
+
+// ---------- триплекс и обработка: общие блоки ----------
+function heroBox(hero, part) {
+  return h("div", {class: "box"}, h("div", {class: "hd"}, h("h2", null, "Шапка раздела")),
+    h("div", {class: "row3"}, field("Надпись над заголовком", hero, "kicker", part), field("Заголовок", hero, "title", part), field("Продолжение заголовка (синим)", hero, "em", part)),
+    field("Текст под заголовком", hero, "text", part, {ta: 1}));
+}
+function specBox(cols, part) {
+  return h("div", {class: "row3"}, cols.map(c => h("div", null, field("Заголовок колонки", c, "h", part), field("Подзаголовок", c, "of", part),
+    field("Пункты (каждый с новой строки; <b>жирный</b>)", c, "li", part, {lines: 1, rows: 4}))));
+}
+function cardItem(list, c, i, part, o) {
+  return h("div", {class: "item" + (c.hide ? " hid" : "")},
+    h("div", null, h("img", {src: c.__preview || o.src(c), alt: ""}), photoBtn("Заменить фото", f => o.photo(c, f))),
+    h("div", null, h("div", {class: "row2"}, field("Название", c, "n", part), o.second(c)), field("Описание", c, "d", part, {ta: 1})),
+    tools(list, i, part, c, "карточку"));
+}
+async function cardPhoto(c, file, prefix, key, part) {
+  const blob = await makeImage(file, 1000);
+  if (!c.__newImg) { c[key] = "u" + Date.now().toString(36); c.__newImg = 1; delete c.zn; delete c.zp; delete c.lab; delete c.ly; }   // своя картинка — без подписей зон
+  queue(`full/img/${prefix}${c[key]}.webp`, blob);
+  c.__preview = URL.createObjectURL(blob); touch(part);
+}
+function viewTx() {
+  const D = S.tx;
+  const o = {src: c => c.r ? `img/tx_${c.r}.webp` : "", photo: (c, f) => cardPhoto(c, f, "tx_", "r", "tx"), second: c => field("Метка на фото (Под заказ, На складе… или пусто)", c, "kind", "tx")};
+  return [heroBox(D.hero, "tx"),
+    h("div", {class: "box"}, h("div", {class: "hd"}, h("h2", null, "Три колонки под шапкой")), specBox(D.spec, "tx"), field("Плашка под колонками (<b>жирный</b>)", D, "note", "tx", {ta: 1})),
+    D.sections.map((s, si) => h("div", {class: "box", style: s.hide ? "opacity:.6" : ""},
+      h("div", {class: "hd"}, h("h2", null, s.title), tools(D.sections, si, "tx", s, "раздел")),
+      h("div", {class: "row2"}, field("Заголовок раздела", s, "title", "tx"), field("Пояснение под заголовком", s, "lead", "tx", {ta: 1})),
+      s.spec ? specBox(s.spec, "tx") : null,
+      s.note != null ? field("Плашка (<b>жирный</b>)", s, "note", "tx", {ta: 1}) : null,
+      s.scheme ? h("div", {class: "row2"}, field("Схема: заголовок", s.scheme, "title", "tx"), field("Схема: текст", s.scheme, "text", "tx", {ta: 1})) : null,
+      (s.cards || []).map((c, i) => cardItem(s.cards, c, i, "tx", o)),
+      h("div", {style: "border-top:1px solid var(--line);padding-top:12px"}, photoBtn("+ Добавить карточку (сначала выберите фото)", async f => {
+        const c = {n: "Новая карточка", d: "", kind: ""}; await cardPhoto(c, f, "tx_", "r", "tx"); (s.cards = s.cards || []).push(c);
+      })),
+      s.palette ? h("div", null, field("Палитра: заголовок", s.palette, "title", "tx"),
+        s.palette.groups.map(g => h("div", {class: "row2"}, field("Группа цветов", g, "g", "tx"),
+          h("div", null, h("label", {class: "f"}, "Цвета: название | описание | #цвет — по одному в строке"),
+            h("textarea", {rows: Math.max(3, g.items.length), oninput: e => { g.items = e.target.value.split("\n").map(l => l.split("|").map(x => x.trim())).filter(a => a[0]).map(a => [a[0], a[1] || "", a[2] || "#cccccc"]); touch("tx"); }}, g.items.map(a => a.join(" | ")).join("\n"))))),
+        field("Примечание под палитрой", s.palette, "fine", "tx")) : null))];
+}
+function viewOb() {
+  const D = S.ob;
+  const o = {src: c => `img/ob_${c.ph}.webp`, photo: (c, f) => cardPhoto(c, f, "ob_", "ph", "ob"), second: c => field("Варианты (каждый с новой строки)", c, "o", "ob", {lines: 1})};
+  return [heroBox(D.hero, "ob"),
+    D.groups.map((g, gi) => h("div", {class: "box", style: g.hide ? "opacity:.6" : ""},
+      h("div", {class: "hd"}, h("h2", null, g.g), tools(D.groups, gi, "ob", g, "раздел")),
+      h("div", {class: "row2"}, field("Заголовок раздела", g, "g", "ob"), field("Пояснение под заголовком", g, "lead", "ob")),
+      g.items.map((c, i) => cardItem(g.items, c, i, "ob", o)),
+      h("div", {style: "border-top:1px solid var(--line);padding-top:12px"}, photoBtn("+ Добавить карточку (сначала выберите фото)", async f => {
+        const c = {n: "Новая обработка", d: "", o: []}; await cardPhoto(c, f, "ob_", "ph", "ob"); g.items.push(c);
+      })))),
+    h("div", {class: "box"}, h("button", {class: "btn", onclick: () => { D.groups.push({g: "Новый раздел", lead: "", items: []}); touch("ob"); render(); }}, "+ Добавить раздел"))];
+}
+
+// ---------- сохранение ----------
+const clean = (k, v) => k.startsWith("__") ? undefined : v;   // служебные поля редактора в файлы не пишем
+function files() {
+  const out = [], G = S.glass, enc = t => new TextEncoder().encode(t), today = new Date().toLocaleDateString("ru-RU");
+  if (DIRTY.glass) {
+    const t = "// Каталог ЮГРОС — позиции и цены. Записано редактором (admin.html) " + today + ". ₽ за м².\n" +
+      "// p: толщина → [в резку, с закалкой]; null = «по запросу»; f — номер фото в img/; hide — позиция скрыта\n" +
+      "window.PRICE_DATE = " + JSON.stringify(G.date) + ";\nwindow.PHONE = " + JSON.stringify(G.phone) + ";\n" +
+      "window.CAT_ALL = " + JSON.stringify(G.cat, clean, 1) + ";\n" +
+      "window.CAT = window.CAT_ALL.map(function (g) { var c = {}; for (var k in g) c[k] = g[k]; c.items = g.items.filter(function (i) { return !i.hide; }); return c; }).filter(function (g) { return g.items.length; });\n";
+    out.push({path: "data.js", bytes: enc(t)}, {path: "full/data.js", bytes: enc(t)});
+  }
+  if (DIRTY.tx) out.push({path: "full/tx-data.js", bytes: enc("// Данные раздела «Триплекс». Записано редактором (admin.html) " + today + ".\nwindow.TXD = " + JSON.stringify(S.tx, clean, 1) + ";\n")});
+  if (DIRTY.ob) out.push({path: "full/ob-data.js", bytes: enc("// Данные раздела «Обработка». Записано редактором (admin.html) " + today + ".\nwindow.OBD = " + JSON.stringify(S.ob, clean, 1) + ";\n")});
+  return out;
+}
+async function save() {
+  if (LOCAL) return say("Проверочный режим: сохранение отключено. К записи готово файлов: " + (files().length + UPLOADS.length), "bad");
+  const btn = document.getElementById("save"); btn.disabled = true;
+  try {
+    const list = files(), total = UPLOADS.length + list.length; let n = 0;
+    if (!total) { say("Изменений нет", ""); return; }
+    for (const u of UPLOADS.slice()) { say(`Сохраняю ${++n} из ${total}: фото…`); await put(u.path, new Uint8Array(await u.blob.arrayBuffer()), "Редактор: фото " + u.path); UPLOADS = UPLOADS.filter(x => x !== u); }
+    for (const f of list) { say(`Сохраняю ${++n} из ${total}: ${f.path}…`); await put(f.path, f.bytes, "Редактор: " + f.path); }
+    DIRTY = {glass: false, tx: false, ob: false};
+    say("Сохранено. Каталог на сайте обновится через 1–2 минуты (обновите страницу каталога).", "ok");
+  } catch (e) { say("Не сохранено: " + e.message + ". Изменения на экране целы — попробуйте ещё раз.", "bad"); }
+  finally { btn.disabled = false; }
+}
+window.addEventListener("beforeunload", e => { if (DIRTY.glass || DIRTY.tx || DIRTY.ob || UPLOADS.length) { e.preventDefault(); e.returnValue = ""; } });
+
+// ---------- экран ----------
+function render() {
+  const y = window.scrollY, tab = (id, name) => h("button", {class: "btn" + (TAB === id ? " on" : ""), onclick: () => { TAB = id; render(); window.scrollTo(0, 0); }}, name + (DIRTY[id] ? " •" : ""));
+  document.getElementById("app").replaceChildren(h("div", {class: "wrap"},
+    h("h1", null, "Редактор каталога ЮГРОС"),
+    h("div", {class: "muted"}, "Правки появляются на сайте только после кнопки «Сохранить на сайт». ",
+      h("a", {href: SITE, target: "_blank", rel: "noopener"}, "Открыть каталог"), " · ",
+      h("a", {href: "#", onclick: e => { e.preventDefault(); if (confirm("Выйти? Несохранённые правки пропадут.")) { localStorage.removeItem("yugros_key"); sessionStorage.removeItem("yugros_key"); TOKEN = ""; S = null; showLogin(); } }}, "Выйти")),
+    h("div", {class: "tabs"}, tab("glass", "Стекло и цены"), tab("tx", "Триплекс"), tab("ob", "Обработка")),
+    TAB === "glass" ? viewGlass() : TAB === "tx" ? viewTx() : viewOb()),
+    h("div", {class: "bar"}, h("span", {id: "msg"}, (DIRTY.glass || DIRTY.tx || DIRTY.ob || UPLOADS.length) ? "Есть несохранённые изменения" : "Изменений нет"),
+      h("button", {class: "btn p", id: "save", onclick: save}, "Сохранить на сайт")));
+  window.scrollTo(0, y);
+}
+TOKEN = sessionStorage.getItem("yugros_key") || localStorage.getItem("yugros_key") || "";
+if (TOKEN && !LOCAL) load().catch(e => { TOKEN = ""; showLogin("Не получилось войти — " + e.message); }); else showLogin();
+</script>
+</body>
+</html>
