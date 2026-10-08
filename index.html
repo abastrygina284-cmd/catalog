@@ -274,7 +274,8 @@ document.querySelectorAll("[data-date]").forEach(e => e.textContent = PRICE_DATE
 document.querySelectorAll("[data-phone]").forEach(e => { e.textContent = PHONE.text; e.href = PHONE.href; });
 $("#fCount").textContent = ALL.length;
 $("#stack").innerHTML = [[24, "p1"], [1, "p2"], [11, "p3"]].map(([f, c]) => {
-  const it = ALL.find(i => i.f === f);
+  const it = ALL.find(i => i.f === f) || ALL[0];   // позицию с обложки могли убрать в редакторе — берём первую
+  if (!it) return ""; f = it.f;
   return `<div class="pane ${c}" data-open="${it.id}"><img src="${thumb(f)}" alt="${it.n}" width="560" height="560"></div>`;
 }).join("");
 
