@@ -92,6 +92,12 @@ table.pr{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;fo
 .pr tr:first-child td.t{border-radius:8px 8px 0 0}.pr tr:last-child td.t{border-radius:0 0 8px 8px}
 .pr tr:only-child td.t{border-radius:8px}
 .pr .na{color:var(--muted);font-weight:500}
+.pr td.fm{font-size:12px;font-weight:600;color:var(--muted);line-height:1.35;vertical-align:top}
+.pr tr.fmr{display:none}.pr tr.fmr td{border-top:0;padding:0 0 5px;text-align:left;white-space:normal;font-size:11px;font-weight:600;color:var(--muted)}
+.body{container-type:inline-size}
+@container (max-width:300px){.pr td.fm,.pr th.fmh{display:none}.pr tr.fmr{display:table-row}}
+.pr tr:has(+ tr.fmr:last-child) td.t{border-radius:0 0 8px 8px}.pr tbody tr:first-child:has(+ tr.fmr:last-child) td.t{border-radius:8px}
+.pr th:last-child{white-space:nowrap}
 .unit{font-size:11px;color:var(--muted);margin-top:8px}
 
 .notes{margin:64px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
@@ -172,6 +178,7 @@ footer{padding:34px 0 60px;text-align:center;color:var(--muted);font-size:13px}
 .pdf table.pr{font-size:10.5px;margin-top:1.6mm}
 .pdf .pr th{font-size:6.5px;padding:0 5px 3px;letter-spacing:.06em}
 .pdf .pr td{padding:2.2px 5px}
+.pdf .pr td.fm{font-size:8.5px;line-height:1.25}
 .pdf .pr td:first-child span{font-size:9.5px;min-width:0;padding:1.5px 6px;border-radius:5px}
 .pdf .unit{display:none}
 .pdf .grid + .grid{margin-top:2.5mm}
@@ -261,7 +268,7 @@ document.documentElement.classList.add(PRINT ? "pdf" : "js");
 const PDF_LAYOUT = [
   [{h:2, ph:43}, {h:2, ph:30}],
   [{v:3, a:"4/3"}],
-  [{h:2, ph:40}, {h:2, ph:32}],
+  [{h:2, ph:40}, {v:3, a:"5/4"}],
   [{h:2, ph:36}, {h:2, ph:36}],
   [{v:3, a:"5/4"}, {v:3, a:"5/4"}],
   [{v:3, a:"1/1"}, {v:3, a:"1/1"}],
@@ -288,13 +295,17 @@ function minPrice(it) {
   return v.length ? Math.min(...v) : null;
 }
 function priceTable(it) {
+  const hasFm = it.fm && Object.keys(it.fm).length > 0;   // форматы листов из инвентаризации склада (с 10.11.2026)
   const rows = Object.keys(it.p).map(t => {
     const v = it.p[t];
     const cut = v ? fmt(v[0]) : '<span class="na">по запросу</span>';
     const tmp = v && v[1] ? fmt(v[1]) : '<span class="na">—</span>';
-    return `<tr><td><span>${t} мм</span></td><td>${cut}</td>` + (it.mirror ? "" : `<td class="t">${tmp}</td>`) + "</tr>";
+    const f = hasFm ? (it.fm[t] || []) : [];
+    const lst = hasFm ? `<td class="fm">${f.join("<br>") || '<span class="na">—</span>'}</td>` : "";   // формат листа, мм
+    const fmr = f.length ? `<tr class="fmr"><td colspan="3">лист ${f.map(x => x.replace(/ /g, "&nbsp;")).join(" · ")}&nbsp;мм</td></tr>` : "";   // то же строкой — на телефоне
+    return `<tr><td><span>${t} мм</span></td><td>${cut}</td>` + (it.mirror ? "" : `<td class="t">${tmp}</td>`) + lst + "</tr>" + fmr;
   }).join("");
-  return `<table class="pr"><thead><tr><th>Толщина</th><th>В резку</th>${it.mirror ? "" : "<th>С закалкой</th>"}</tr></thead><tbody>${rows}</tbody></table><div class="unit">₽ за м² · прайс партнёра от ${PRICE_DATE}</div>`;
+  return `<table class="pr"><thead><tr><th>Толщина</th><th>В резку</th>${it.mirror ? "" : "<th>С закалкой</th>"}${hasFm ? "<th class=\"fmh\">Лист, мм</th>" : ""}</tr></thead><tbody>${rows}</tbody></table><div class="unit">₽ за м² · прайс партнёра от ${PRICE_DATE}</div>`;
 }
 const plural = n => n % 10 === 1 && n % 100 !== 11 ? "позиция" : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "позиции" : "позиций");
 
